@@ -56,8 +56,8 @@ Each rose consists of:
 Clone and run:
 
 ```bash
-git clone https://github.com/smart-developer1791/go-fiber-auth-sakura
-cd go-fiber-auth-sakura
+git clone https://github.com/smart-developer1791/go-fiber-auth-crystal-rose
+cd go-fiber-auth-crystal-rose
 ```
 
 Initialize and start:
