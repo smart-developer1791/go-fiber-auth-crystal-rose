@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🌹 Crystal Rose Garden ~ Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      defer
+      src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"
+    ></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+      }
+    </script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Quicksand:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              crystal: {
+                pink: "#ff6b9d",
+                rose: "#c41e3a",
+                light: "#ffd6e0",
+                glow: "#ff8fab",
+              },
+            },
+            fontFamily: {
+              elegant: ["Cormorant Garamond", "serif"],
+              soft: ["Quicksand", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      #three-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+      }
+
+      .glass-form {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow:
+          0 8px 32px rgba(196, 30, 58, 0.2),
+          inset 0 0 80px rgba(255, 107, 157, 0.05);
+      }
+
+      .crystal-input {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+      }
+
+      .crystal-input:focus {
+        background: rgba(255, 255, 255, 0.15);
+        border-color: rgba(255, 107, 157, 0.5);
+        box-shadow: 0 0 20px rgba(255, 107, 157, 0.2);
+      }
+
+      .crystal-input.error {
+        border-color: rgba(255, 100, 100, 0.5);
+        background: rgba(255, 100, 100, 0.1);
+      }
+
+      .crystal-input.valid {
+        border-color: rgba(100, 255, 150, 0.5);
+        background: rgba(100, 255, 150, 0.05);
+      }
+
+      .rose-btn {
+        background: linear-gradient(
+          135deg,
+          #ff6b9d 0%,
+          #c41e3a 50%,
+          #ff6b9d 100%
+        );
+        background-size: 200% 200%;
+        animation: shimmer 3s ease infinite;
+        box-shadow: 0 4px 30px rgba(196, 30, 58, 0.4);
+      }
+
+      .rose-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 40px rgba(196, 30, 58, 0.6);
+      }
+
+      @keyframes shimmer {
+        0%,
+        100% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .float {
+        animation: float 4s ease-in-out infinite;
+      }
+      .fade-in {
+        animation: fadeIn 0.8s ease-out forwards;
+      }
+
+      .sparkle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: white;
+        border-radius: 50%;
+        animation: sparkle 2s ease-in-out infinite;
+      }
+
+      @keyframes sparkle {
+        0%,
+        100% {
+          opacity: 0;
+          transform: scale(0);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="min-h-screen overflow-x-hidden bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900"
+  >
+    <!-- Three.js Canvas -->
+    <canvas id="three-canvas"></canvas>
+
+    <!-- Sparkles Overlay -->
+    <div
+      class="fixed inset-0 pointer-events-none z-10 overflow-hidden"
+      id="sparkles"
+    ></div>
+
+    <!-- Main Content -->
+    <div
+      class="relative z-20 min-h-screen flex items-center justify-center p-4"
+      x-data="loginForm()"
+    >
+      <div class="w-full max-w-md fade-in">
+        <!-- Header -->
+        <div class="text-center mb-8 float">
+          <div class="inline-block mb-4">
+            <span class="text-6xl filter drop-shadow-lg">🌹</span>
+          </div>
+          <h1 class="font-elegant text-5xl text-white mb-2 tracking-wide">
+            Crystal Rose
+          </h1>
+          <p class="font-soft text-crystal-light/80 text-lg">
+            Enter your enchanted garden
+          </p>
+        </div>
+
+        <!-- Login Form -->
+        <div class="glass-form rounded-3xl p-8">
+          <form @submit.prevent="submitLogin" class="space-y-6">
+            <!-- Email -->
+            <div class="space-y-2">
+              <label
+                class="block font-soft text-white/80 text-sm tracking-wide"
+              >
+                Garden Address
+              </label>
+              <div class="relative">
+                <input
+                  type="email"
+                  x-model="email"
+                  @blur="validateField('login_email', email)"
+                  @input="clearError('email')"
+                  :class="{'error': errors.email, 'valid': validated.email}"
+                  class="crystal-input w-full px-5 py-4 rounded-2xl text-white placeholder-white/40 font-soft focus:outline-none"
+                  placeholder="your@garden.rose"
+                />
+                <div class="absolute right-4 top-1/2 -translate-y-1/2">
+                  <span x-show="validated.email" class="text-green-400 text-lg"
+                    >✓</span
+                  >
+                  <span x-show="errors.email" class="text-red-400 text-lg"
+                    >✗</span
+                  >
+                </div>
+              </div>
+              <p
+                x-show="errors.email"
+                x-text="errors.email"
+                class="text-red-300 text-sm font-soft"
+              ></p>
+            </div>
+
+            <!-- Password -->
+            <div class="space-y-2">
+              <label
+                class="block font-soft text-white/80 text-sm tracking-wide"
+              >
+                Secret Phrase
+              </label>
+              <div class="relative">
+                <input
+                  :type="showPassword ? 'text' : 'password'"
+                  x-model="password"
+                  @input="clearError('password')"
+                  :class="{'error': errors.password}"
+                  class="crystal-input w-full px-5 py-4 rounded-2xl text-white placeholder-white/40 font-soft focus:outline-none pr-20"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  @click="showPassword = !showPassword"
+                  class="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80 transition-colors font-soft text-sm"
+                >
+                  <span x-show="!showPassword">show</span>
+                  <span x-show="showPassword">hide</span>
+                </button>
+              </div>
+              <p
+                x-show="errors.password"
+                x-text="errors.password"
+                class="text-red-300 text-sm font-soft"
+              ></p>
+            </div>
+
+            <!-- Error Message -->
+            <div
+              x-show="errors.general"
+              class="p-4 rounded-xl bg-red-500/20 border border-red-500/30"
+            >
+              <p
+                class="text-red-200 text-center font-soft"
+                x-text="errors.general"
+              ></p>
+            </div>
+
+            <!-- Success Message -->
+            <div
+              x-show="success"
+              class="p-4 rounded-xl bg-green-500/20 border border-green-500/30"
+            >
+              <p
+                class="text-green-200 text-center font-soft"
+                x-text="success"
+              ></p>
+            </div>
+
+            <!-- Submit -->
+            <button
+              type="submit"
+              :disabled="loading"
+              class="rose-btn w-full py-4 rounded-2xl text-white font-soft font-semibold text-lg tracking-wide transition-all duration-300 disabled:opacity-50"
+            >
+              <span
+                x-show="!loading"
+                class="flex items-center justify-center gap-2"
+              >
+                <span>Enter Garden</span>
+                <span>🌹</span>
+              </span>
+              <span
+                x-show="loading"
+                class="flex items-center justify-center gap-2"
+              >
+                <svg
+                  class="animate-spin h-5 w-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                <span>Opening gates...</span>
+              </span>
+            </button>
+          </form>
+
+          <!-- Register Link -->
+          <div class="mt-8 text-center">
+            <p class="font-soft text-white/60 mb-2">New to the garden?</p>
+            <a
+              href="/register"
+              class="font-elegant text-xl text-crystal-pink hover:text-crystal-light transition-colors inline-flex items-center gap-2"
+            >
+              <span>Plant your rose</span>
+              <span>→</span>
+            </a>
+          </div>
+
+          <!-- Demo -->
+          <div class="mt-6 p-4 rounded-xl bg-white/5 border border-white/10">
+            <p class="text-center font-soft text-white/50 text-sm mb-2">
+              Demo Garden
+            </p>
+            <p class="text-center font-soft text-white/70 text-sm">
+              rose@crystal.garden / rose2024
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Three.js Scene -->
+    <script type="module">
+      import * as THREE from "three";
+      import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+      // Scene setup
+      const canvas = document.getElementById("three-canvas");
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x1a0a1a, 0.02);
+
+      const camera = new THREE.PerspectiveCamera(
+        60,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000,
+      );
+      camera.position.set(0, 2, 8);
+
+      const renderer = new THREE.WebGLRenderer({
+        canvas,
+        antialias: true,
+        alpha: true,
+      });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.2;
+
+      // Lights
+      const ambientLight = new THREE.AmbientLight(0x4a1a4a, 0.5);
+      scene.add(ambientLight);
+
+      const mainLight = new THREE.PointLight(0xff6b9d, 2, 50);
+      mainLight.position.set(5, 10, 5);
+      scene.add(mainLight);
+
+      const secondLight = new THREE.PointLight(0x6b9dff, 1.5, 50);
+      secondLight.position.set(-5, 8, -5);
+      scene.add(secondLight);
+
+      const rimLight = new THREE.PointLight(0xffd6e0, 1, 30);
+      rimLight.position.set(0, 5, -10);
+      scene.add(rimLight);
+
+      // Crystal Rose Material
+      const crystalMaterial = new THREE.MeshPhysicalMaterial({
+        color: 0xff6b9d,
+        metalness: 0.1,
+        roughness: 0.05,
+        transmission: 0.9,
+        thickness: 1.5,
+        envMapIntensity: 1,
+        clearcoat: 1,
+        clearcoatRoughness: 0.1,
+        ior: 2.4,
+        transparent: true,
+        opacity: 0.9,
+      });
+
+      const darkCrystalMaterial = new THREE.MeshPhysicalMaterial({
+        color: 0xc41e3a,
+        metalness: 0.2,
+        roughness: 0.1,
+        transmission: 0.8,
+        thickness: 2,
+        envMapIntensity: 1.2,
+        clearcoat: 1,
+        clearcoatRoughness: 0.05,
+        ior: 2.2,
+        transparent: true,
+        opacity: 0.85,
+      });
+
+      const stemMaterial = new THREE.MeshPhysicalMaterial({
+        color: 0x2d5a27,
+        metalness: 0.3,
+        roughness: 0.3,
+        transmission: 0.6,
+        thickness: 0.5,
+        clearcoat: 0.8,
+        transparent: true,
+        opacity: 0.8,
+      });
+
+      // Create rose petal geometry
+      function createPetal() {
+        const shape = new THREE.Shape();
+        shape.moveTo(0, 0);
+        shape.quadraticCurveTo(0.3, 0.5, 0, 1);
+        shape.quadraticCurveTo(-0.3, 0.5, 0, 0);
+
+        const extrudeSettings = {
+          steps: 1,
+          depth: 0.05,
+          bevelEnabled: true,
+          bevelThickness: 0.02,
+          bevelSize: 0.02,
+          bevelSegments: 3,
+        };
+
+        return new THREE.ExtrudeGeometry(shape, extrudeSettings);
+      }
+
+      // Create a rose
+      function createRose(x, y, z, scale = 1, material = crystalMaterial) {
+        const roseGroup = new THREE.Group();
+        const petalGeom = createPetal();
+
+        // Center petals
+        for (let layer = 0; layer < 4; layer++) {
+          const petalsInLayer = 5 + layer * 2;
+          const layerRadius = 0.1 + layer * 0.15;
+          const layerHeight = layer * 0.1;
+          const openAngle = 20 + layer * 15;
+
+          for (let i = 0; i < petalsInLayer; i++) {
+            const petal = new THREE.Mesh(petalGeom, material);
+            const angle = (i / petalsInLayer) * Math.PI * 2 + layer * 0.3;
+
+            petal.position.x = Math.cos(angle) * layerRadius;
+            petal.position.z = Math.sin(angle) * layerRadius;
+            petal.position.y = layerHeight;
+
+            petal.rotation.y = -angle + Math.PI / 2;
+            petal.rotation.x = THREE.MathUtils.degToRad(openAngle);
+
+            petal.scale.set(0.5 + layer * 0.15, 0.5 + layer * 0.1, 1);
+            roseGroup.add(petal);
+          }
+        }
+
+        // Stem
+        const stemGeom = new THREE.CylinderGeometry(0.03, 0.05, 2, 8);
+        const stem = new THREE.Mesh(stemGeom, stemMaterial);
+        stem.position.y = -1;
+        roseGroup.add(stem);
+
+        // Leaves
+        const leafShape = new THREE.Shape();
+        leafShape.moveTo(0, 0);
+        leafShape.quadraticCurveTo(0.2, 0.3, 0, 0.6);
+        leafShape.quadraticCurveTo(-0.2, 0.3, 0, 0);
+
+        const leafGeom = new THREE.ExtrudeGeometry(leafShape, {
+          steps: 1,
+          depth: 0.02,
+          bevelEnabled: true,
+          bevelThickness: 0.01,
+          bevelSize: 0.01,
+          bevelSegments: 2,
+        });
+
+        const leaf1 = new THREE.Mesh(leafGeom, stemMaterial);
+        leaf1.position.set(0.15, -0.5, 0);
+        leaf1.rotation.set(0, 0, -Math.PI / 4);
+        leaf1.scale.set(0.8, 0.8, 1);
+        roseGroup.add(leaf1);
+
+        const leaf2 = new THREE.Mesh(leafGeom, stemMaterial);
+        leaf2.position.set(-0.15, -0.8, 0);
+        leaf2.rotation.set(0, Math.PI, Math.PI / 4);
+        leaf2.scale.set(0.7, 0.7, 1);
+        roseGroup.add(leaf2);
+
+        roseGroup.position.set(x, y, z);
+        roseGroup.scale.set(scale, scale, scale);
+
+        return roseGroup;
+      }
+
+      // Create multiple roses
+      const roses = [];
+      const rosePositions = [
+        { x: 0, y: 0, z: 0, scale: 1.5, mat: darkCrystalMaterial },
+        { x: -3, y: -0.5, z: -2, scale: 1, mat: crystalMaterial },
+        { x: 3, y: -0.3, z: -1, scale: 1.2, mat: crystalMaterial },
+        { x: -2, y: -0.2, z: 2, scale: 0.9, mat: darkCrystalMaterial },
+        { x: 2.5, y: -0.4, z: 3, scale: 1.1, mat: crystalMaterial },
+        { x: -4, y: -0.6, z: 1, scale: 0.8, mat: crystalMaterial },
+        { x: 4, y: -0.5, z: -3, scale: 0.9, mat: darkCrystalMaterial },
+        { x: 0, y: -0.3, z: 4, scale: 1, mat: crystalMaterial },
+        { x: -1.5, y: -0.4, z: -4, scale: 0.85, mat: crystalMaterial },
+        { x: 1.5, y: -0.35, z: -3, scale: 0.95, mat: darkCrystalMaterial },
+      ];
+
+      rosePositions.forEach((pos) => {
+        const rose = createRose(pos.x, pos.y, pos.z, pos.scale, pos.mat);
+        roses.push(rose);
+        scene.add(rose);
+      });
+
+      // Floating particles (dewdrops / sparkles)
+      const particleCount = 200;
+      const particleGeom = new THREE.BufferGeometry();
+      const positions = new Float32Array(particleCount * 3);
+      const colors = new Float32Array(particleCount * 3);
+
+      for (let i = 0; i < particleCount; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 20;
+        positions[i * 3 + 1] = Math.random() * 10 - 2;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
+
+        const color = new THREE.Color();
+        color.setHSL(0.9 + Math.random() * 0.1, 0.8, 0.7 + Math.random() * 0.3);
+        colors[i * 3] = color.r;
+        colors[i * 3 + 1] = color.g;
+        colors[i * 3 + 2] = color.b;
+      }
+
+      particleGeom.setAttribute(
+        "position",
+        new THREE.BufferAttribute(positions, 3),
+      );
+      particleGeom.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+
+      const particleMat = new THREE.PointsMaterial({
+        size: 0.08,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.8,
+        blending: THREE.AdditiveBlending,
+      });
+
+      const particles = new THREE.Points(particleGeom, particleMat);
+      scene.add(particles);
+
+      // Ground mist
+      const mistGeom = new THREE.PlaneGeometry(50, 50);
+      const mistMat = new THREE.MeshBasicMaterial({
+        color: 0x2a1a2a,
+        transparent: true,
+        opacity: 0.5,
+        side: THREE.DoubleSide,
+      });
+      const mist = new THREE.Mesh(mistGeom, mistMat);
+      mist.rotation.x = -Math.PI / 2;
+      mist.position.y = -2.5;
+      scene.add(mist);
+
+      // Animation
+      let time = 0;
+      function animate() {
+        requestAnimationFrame(animate);
+        time += 0.005;
+
+        // Rotate roses gently
+        roses.forEach((rose, i) => {
+          rose.rotation.y = Math.sin(time + i) * 0.1;
+          rose.position.y += Math.sin(time * 2 + i * 0.5) * 0.001;
+        });
+
+        // Animate particles
+        const positions = particles.geometry.attributes.position.array;
+        for (let i = 0; i < particleCount; i++) {
+          positions[i * 3 + 1] += Math.sin(time + i) * 0.002;
+          if (positions[i * 3 + 1] > 8) positions[i * 3 + 1] = -2;
+        }
+        particles.geometry.attributes.position.needsUpdate = true;
+        particles.rotation.y = time * 0.05;
+
+        // Camera subtle movement
+        camera.position.x = Math.sin(time * 0.3) * 0.5;
+        camera.position.y = 2 + Math.sin(time * 0.4) * 0.3;
+        camera.lookAt(0, 0.5, 0);
+
+        // Lights movement
+        mainLight.position.x = Math.sin(time) * 5;
+        mainLight.position.z = Math.cos(time) * 5;
+        secondLight.position.x = Math.cos(time * 0.7) * 5;
+        secondLight.position.z = Math.sin(time * 0.7) * 5;
+
+        renderer.render(scene, camera);
+      }
+
+      animate();
+
+      // Handle resize
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      // Create HTML sparkles
+      const sparklesContainer = document.getElementById("sparkles");
+      for (let i = 0; i < 30; i++) {
+        const sparkle = document.createElement("div");
+        sparkle.className = "sparkle";
+        sparkle.style.left = Math.random() * 100 + "%";
+        sparkle.style.top = Math.random() * 100 + "%";
+        sparkle.style.animationDelay = Math.random() * 4 + "s";
+        sparkle.style.animationDuration = 2 + Math.random() * 2 + "s";
+        sparklesContainer.appendChild(sparkle);
+      }
+    </script>
+
+    <!-- Alpine.js Form Logic -->
+    <script>
+      function loginForm() {
+        return {
+          email: "",
+          password: "",
+          showPassword: false,
+          loading: false,
+          errors: {},
+          validated: {},
+          success: "",
+
+          clearError(field) {
+            delete this.errors[field];
+            delete this.validated[field];
+          },
+
+          async validateField(field, value) {
+            if (!value.trim()) return;
+
+            try {
+              const res = await fetch("/api/validate", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ field, value }),
+              });
+              const data = await res.json();
+
+              const actualField = field === "login_email" ? "email" : field;
+
+              if (data.success) {
+                delete this.errors[actualField];
+                this.validated[actualField] = true;
+              } else {
+                this.errors[actualField] = data.message;
+                delete this.validated[actualField];
+              }
+            } catch (e) {
+              console.error(e);
+            }
+          },
+
+          async submitLogin() {
+            this.loading = true;
+            this.errors = {};
+            this.success = "";
+
+            try {
+              const res = await fetch("/api/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  email: this.email,
+                  password: this.password,
+                }),
+              });
+
+              const data = await res.json();
+
+              if (data.success) {
+                this.success = data.message;
+                setTimeout(() => {
+                  window.location.href = "/dashboard";
+                }, 1000);
+              } else {
+                if (data.field && data.field !== "general") {
+                  this.errors[data.field] = data.message;
+                } else {
+                  this.errors.general = data.message;
+                }
+              }
+            } catch (e) {
+              this.errors.general = "Connection error. Please try again.";
+            } finally {
+              this.loading = false;
+            }
+          },
+        };
+      }
+    </script>
+  </body>
+</html>

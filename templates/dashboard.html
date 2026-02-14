@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🌹 Crystal Rose Garden ~ Your Garden</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script
+      defer
+      src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"
+    ></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+      }
+    </script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Quicksand:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              crystal: {
+                pink: "#ff6b9d",
+                rose: "#c41e3a",
+                light: "#ffd6e0",
+                glow: "#ff8fab",
+              },
+            },
+            fontFamily: {
+              elegant: ["Cormorant Garamond", "serif"],
+              soft: ["Quicksand", "sans-serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      #three-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+      }
+
+      .glass-card {
+        background: rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+      }
+
+      .glass-header {
+        background: rgba(20, 10, 30, 0.8);
+        backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .float {
+        animation: float 4s ease-in-out infinite;
+      }
+      .fade-in {
+        animation: fadeIn 0.8s ease-out forwards;
+      }
+
+      .sparkle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: white;
+        border-radius: 50%;
+        animation: sparkle 2s ease-in-out infinite;
+      }
+
+      @keyframes sparkle {
+        0%,
+        100% {
+          opacity: 0;
+          transform: scale(0);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-950 to-slate-900"
+    x-data="{ showLogout: false }"
+  >
+    <!-- Three.js Canvas -->
+    <canvas id="three-canvas"></canvas>
+
+    <!-- Sparkles -->
+    <div
+      class="fixed inset-0 pointer-events-none z-10 overflow-hidden"
+      id="sparkles"
+    ></div>
+
+    <!-- Header -->
+    <header class="glass-header fixed top-0 left-0 right-0 z-50 px-6 py-4">
+      <div class="max-w-6xl mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <span class="text-3xl">🌹</span>
+          <div>
+            <h1 class="font-elegant text-2xl text-white">Crystal Rose</h1>
+            <p class="font-soft text-xs text-crystal-light/60">Your Garden</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <div class="hidden sm:block text-right">
+            <p class="font-soft text-white/60 text-sm">{{.Email}}</p>
+          </div>
+
+          <button
+            @click="showLogout = true"
+            class="px-5 py-2.5 rounded-xl border border-white/20 font-soft text-white/80 hover:bg-white/10 transition-all duration-300"
+          >
+            Leave Garden
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main
+      class="relative z-20 min-h-screen flex items-center justify-center p-4 pt-24"
+    >
+      <div class="max-w-4xl w-full">
+        <!-- Welcome Card -->
+        <div class="glass-card rounded-3xl p-8 text-center fade-in mb-8">
+          <div class="text-8xl mb-6 float inline-block">🌹</div>
+          <h2 class="font-elegant text-4xl text-white mb-4">
+            Welcome to Your Crystal Garden
+          </h2>
+          <p class="font-soft text-crystal-light/80 text-lg max-w-xl mx-auto">
+            Your roses bloom eternal, each petal a crystal capturing the light
+            of love. Happy Valentine's Day! 💕
+          </p>
+        </div>
+
+        <!-- Info Cards -->
+        <div class="grid md:grid-cols-2 gap-6">
+          <div
+            class="glass-card rounded-2xl p-6 fade-in float"
+            style="animation-delay: 0.2s"
+          >
+            <div class="flex items-center gap-3 mb-4">
+              <span class="text-3xl">💎</span>
+              <h3 class="font-elegant text-xl text-white">Garden Address</h3>
+            </div>
+            <p class="font-soft text-crystal-light/70">{{.Email}}</p>
+          </div>
+
+          <div
+            class="glass-card rounded-2xl p-6 fade-in float"
+            style="animation-delay: 0.4s"
+          >
+            <div class="flex items-center gap-3 mb-4">
+              <span class="text-3xl">🌸</span>
+              <h3 class="font-elegant text-xl text-white">Contact Petal</h3>
+            </div>
+            <p class="font-soft text-crystal-light/70">{{.Phone}}</p>
+          </div>
+        </div>
+
+        <!-- Quote -->
+        <div
+          class="glass-card rounded-3xl p-8 mt-8 text-center fade-in"
+          style="animation-delay: 0.6s"
+        >
+          <p class="font-elegant text-2xl text-white/90 italic leading-relaxed">
+            "A flower cannot blossom without sunshine, and a heart cannot love
+            without being loved."
+          </p>
+          <p class="font-soft text-crystal-light/60 mt-4">— Max Müller</p>
+        </div>
+      </div>
+    </main>
+
+    <!-- Logout Modal -->
+    <div
+      x-show="showLogout"
+      x-transition:enter="transition ease-out duration-300"
+      x-transition:enter-start="opacity-0"
+      x-transition:enter-end="opacity-100"
+      x-transition:leave="transition ease-in duration-200"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+    >
+      <div
+        x-show="showLogout"
+        x-transition:enter="transition ease-out duration-300"
+        x-transition:enter-start="scale-90 opacity-0"
+        x-transition:enter-end="scale-100 opacity-100"
+        @click.away="showLogout = false"
+        class="glass-card rounded-3xl p-8 max-w-sm w-full text-center"
+      >
+        <div class="text-6xl mb-4">🥀</div>
+        <h3 class="font-elegant text-2xl text-white mb-2">Leave the Garden?</h3>
+        <p class="font-soft text-white/60 mb-6">
+          Your roses will wait for your return.
+        </p>
+
+        <div class="flex gap-4">
+          <button
+            @click="showLogout = false"
+            class="flex-1 py-3 rounded-xl border border-white/20 font-soft text-white hover:bg-white/10 transition-colors"
+          >
+            Stay
+          </button>
+          <form action="/logout" method="POST" class="flex-1">
+            <button
+              type="submit"
+              class="w-full py-3 rounded-xl bg-crystal-rose font-soft text-white hover:bg-crystal-rose/80 transition-colors"
+            >
+              Leave
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Three.js Scene -->
+    <script type="module">
+      import * as THREE from "three";
+
+      const canvas = document.getElementById("three-canvas");
+      const scene = new THREE.Scene();
+      scene.fog = new THREE.FogExp2(0x1a0a1a, 0.015);
+
+      const camera = new THREE.PerspectiveCamera(
+        60,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        1000,
+      );
+      camera.position.set(0, 3, 12);
+
+      const renderer = new THREE.WebGLRenderer({
+        canvas,
+        antialias: true,
+        alpha: true,
+      });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+      // Lights
+      scene.add(new THREE.AmbientLight(0x4a1a4a, 0.5));
+
+      const lights = [
+        { color: 0xff6b9d, intensity: 2, pos: [5, 10, 5] },
+        { color: 0x6b9dff, intensity: 1.5, pos: [-5, 8, -5] },
+        { color: 0xffd6e0, intensity: 1, pos: [0, 5, -10] },
+      ];
+
+      lights.forEach((l) => {
+        const light = new THREE.PointLight(l.color, l.intensity, 50);
+        light.position.set(...l.pos);
+        scene.add(light);
+      });
+
+      // Materials
+      const crystalMaterial = new THREE.MeshPhysicalMaterial({
+        color: 0xff6b9d,
+        metalness: 0.1,
+        roughness: 0.05,
+        transmission: 0.9,
+        thickness: 1.5,
+        clearcoat: 1,
+        ior: 2.4,
+        transparent: true,
+        opacity: 0.9,
+      });
+
+      function createPetal() {
+        const shape = new THREE.Shape();
+        shape.moveTo(0, 0);
+        shape.quadraticCurveTo(0.3, 0.5, 0, 1);
+        shape.quadraticCurveTo(-0.3, 0.5, 0, 0);
+        return new THREE.ExtrudeGeometry(shape, {
+          steps: 1,
+          depth: 0.05,
+          bevelEnabled: true,
+          bevelThickness: 0.02,
+          bevelSize: 0.02,
+          bevelSegments: 3,
+        });
+      }
+
+      function createRose(x, y, z, scale = 1) {
+        const group = new THREE.Group();
+        const petalGeom = createPetal();
+
+        for (let layer = 0; layer < 4; layer++) {
+          const count = 5 + layer * 2;
+          for (let i = 0; i < count; i++) {
+            const petal = new THREE.Mesh(petalGeom, crystalMaterial);
+            const angle = (i / count) * Math.PI * 2 + layer * 0.3;
+            petal.position.set(
+              Math.cos(angle) * (0.1 + layer * 0.15),
+              layer * 0.1,
+              Math.sin(angle) * (0.1 + layer * 0.15),
+            );
+            petal.rotation.set(
+              THREE.MathUtils.degToRad(20 + layer * 15),
+              -angle + Math.PI / 2,
+              0,
+            );
+            petal.scale.set(0.5 + layer * 0.15, 0.5 + layer * 0.1, 1);
+            group.add(petal);
+          }
+        }
+
+        group.position.set(x, y, z);
+        group.scale.set(scale, scale, scale);
+        return group;
+      }
+
+      const roses = [];
+      for (let i = 0; i < 15; i++) {
+        const rose = createRose(
+          (Math.random() - 0.5) * 16,
+          (Math.random() - 0.5) * 2 - 1,
+          (Math.random() - 0.5) * 16 - 5,
+          0.6 + Math.random() * 0.8,
+        );
+        roses.push(rose);
+        scene.add(rose);
+      }
+
+      // Particles
+      const particleGeom = new THREE.BufferGeometry();
+      const positions = new Float32Array(300 * 3);
+      for (let i = 0; i < 300; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 30;
+        positions[i * 3 + 1] = Math.random() * 15 - 3;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 30;
+      }
+      particleGeom.setAttribute(
+        "position",
+        new THREE.BufferAttribute(positions, 3),
+      );
+
+      const particles = new THREE.Points(
+        particleGeom,
+        new THREE.PointsMaterial({
+          size: 0.06,
+          color: 0xffaacc,
+          transparent: true,
+          opacity: 0.6,
+          blending: THREE.AdditiveBlending,
+        }),
+      );
+      scene.add(particles);
+
+      let time = 0;
+      function animate() {
+        requestAnimationFrame(animate);
+        time += 0.003;
+
+        roses.forEach((rose, i) => {
+          rose.rotation.y = Math.sin(time + i) * 0.1;
+          rose.position.y += Math.sin(time * 2 + i) * 0.0005;
+        });
+
+        particles.rotation.y = time * 0.03;
+        camera.position.x = Math.sin(time * 0.2) * 2;
+        camera.lookAt(0, 0, -2);
+
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      // Sparkles
+      const sparklesEl = document.getElementById("sparkles");
+      for (let i = 0; i < 40; i++) {
+        const s = document.createElement("div");
+        s.className = "sparkle";
+        s.style.cssText = `left:${Math.random() * 100}%;top:${Math.random() * 100}%;animation-delay:${Math.random() * 4}s;`;
+        sparklesEl.appendChild(s);
+      }
+    </script>
+  </body>
+</html>

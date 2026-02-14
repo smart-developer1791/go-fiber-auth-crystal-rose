@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: go-fiber-auth-crystal-rose
+    env: go
+    plan: free
+    buildCommand: |
+      if [ ! -f go.mod ]; then
+        go mod init crystal-rose-auth
+      fi
+      go mod tidy
+      go build -o crystal-rose-auth .
+    startCommand: ./crystal-rose-auth
